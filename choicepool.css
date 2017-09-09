@@ -1,0 +1,22 @@
+.choicepool-header {
+  background-color: rgba(249, 234, 209, 0.9) !important;
+}
+
+.padded-top {
+  margin-top: 30px !important;
+}
+
+.padded-bottom {
+  margin-bottom: 30px !important;
+}
+
+ol,li {
+  list-style-type: none;
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}
+
+.float-right {
+  float: right}
+}

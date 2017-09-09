@@ -1,0 +1,101 @@
+var database, currentPool;
+
+$(document).ready(function() {
+  database = firebase.database();
+  var btnSearchPools = document.getElementById('btnSearchPools');
+  var inputSearchPools = document.getElementById('inputSearchPools');
+  var btnAddChoice = document.getElementById('btnAddChoice');
+  var inputAddChoice = document.getElementById('inputAddChoice');
+  var poolContents = document.getElementById('poolContents');
+  var poolsList = document.getElementById('poolsList');
+  var linkCreatePool = document.getElementById('linkCreatePool');
+  var textCurrentPool = document.getElementById('textCurrentPool');
+  
+  inputSearchPools.addEventListener('keyup', function(event) {
+    event.preventDefault();
+    if (event.keyCode == 13) {
+      btnSearchPools.click();
+    }
+  });
+  
+  btnSearchPools.addEventListener('click', e => {
+    if(inputSearchPools.value) {
+      changePool(inputSearchPools.value);
+    }
+    inputSearchPools.value = '';
+  });
+  
+  inputAddChoice.addEventListener('keyup', function(event) {
+    event.preventDefault();
+    if (event.keyCode == 13) {
+      btnAddChoice.click();
+    }
+  });
+  
+  btnAddChoice.addEventListener('click', e => {
+    if(inputAddChoice.value) {
+      writeChoice(inputAddChoice.value);     
+    }
+  });
+  
+  linkCreatePool.addEventListener('click', e => {
+    changePool(generatePoolId());
+    console.log('changed pool');
+  });
+  
+  database.ref('pools').on('value', function(snapshot) {
+    var list = '';
+    snapshot.forEach(function(childSnapshot) {
+      list += '<li data-key="' + childSnapshot.key + '">';
+      list += childSnapshot.key;
+      list += '</li>';
+      list += '<hr>';
+    });
+    poolsList.innerHTML = list;
+  });
+});
+
+function generatePoolId() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (var i = 0; i < 8; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
+}
+
+function writeChoice(choice) {
+  currentPool.push({
+    username: currentUserName,
+    uid: currentUserId,
+    userphoto: currentUserPhoto,
+    choice: choice
+  });
+  inputAddChoice.value = '';
+}
+
+function changePool(pool) {
+  database = firebase.database();
+  currentPool = database.ref('pools/' + pool);
+  
+  currentPool.on('value', function(snapshot) {
+    var list = '';
+    snapshot.forEach(function(childSnapshot) {
+      list += '<li data-key="' + childSnapshot.key + '">';
+      list += childSnapshot.val().choice;
+      list += '<div class="float-right text-muted">'
+      list += childSnapshot.val().username;
+      // If the item was added by the current user, make it deletable.
+      if (childSnapshot.val().uid == currentUserId) {
+        list += '&nbsp;<a href="javascript:del(\'' + childSnapshot.key + '\')" class="text-danger">&times;</a>';
+      }
+      list += '</div></li>';
+      list += '<hr>';
+    });
+    poolContents.innerHTML = list;
+    textCurrentPool.textContent = pool;
+  });
+}
+
+function del(key) {
+  currentPool.child(key).remove();
+}
