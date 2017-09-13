@@ -3,11 +3,17 @@
 }
 
 .padded-top {
-  margin-top: 30px !important;
+  margin-top: 40px !important;
 }
 
 .padded-bottom {
-  margin-bottom: 30px !important;
+  margin-bottom: 40px !important;
+}
+
+ol {
+  height: 60vh;
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 ol,li {
@@ -18,5 +24,9 @@ ol,li {
 }
 
 .float-right {
-  float: right}
+  float: right;
+}
+
+.clickable {
+  cursor: pointer;
 }

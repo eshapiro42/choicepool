@@ -10,6 +10,7 @@ $(document).ready(function() {
   var poolsList = document.getElementById('poolsList');
   var linkCreatePool = document.getElementById('linkCreatePool');
   var textCurrentPool = document.getElementById('textCurrentPool');
+  var btnRandomChoice = document.getElementById('btnRandomChoice');
   
   inputSearchPools.addEventListener('keyup', function(event) {
     event.preventDefault();
@@ -18,41 +19,63 @@ $(document).ready(function() {
     }
   });
   
-  btnSearchPools.addEventListener('click', e => {
+  btnSearchPools.addEventListener('click', function() {
     if(inputSearchPools.value) {
       changePool(inputSearchPools.value);
     }
     inputSearchPools.value = '';
   });
   
-  inputAddChoice.addEventListener('keyup', function(event) {
+  inputAddChoice.addEventListener('keyup', function() {
     event.preventDefault();
     if (event.keyCode == 13) {
       btnAddChoice.click();
     }
   });
   
-  btnAddChoice.addEventListener('click', e => {
+  btnAddChoice.addEventListener('click', function() {
     if(inputAddChoice.value) {
       writeChoice(inputAddChoice.value);     
     }
   });
   
-  linkCreatePool.addEventListener('click', e => {
+  linkCreatePool.addEventListener('click', function() {
     changePool(generatePoolId());
     console.log('changed pool');
   });
   
+  btnRandomChoice.addEventListener('click', function() {
+    $('#modalRandomChoice').modal('show');
+  });
+  
+  $(document).on('click', '.pool', function() {
+    changePool(this.textContent);
+  });
+  
+  $('#modalRandomChoice').on('show.bs.modal', function() {
+    $(this).find('#textRandomChoice').text(randomChoice().choice);
+  });
+  
   database.ref('pools').on('value', function(snapshot) {
+    var reverseList =  []
     var list = '';
     snapshot.forEach(function(childSnapshot) {
-      list += '<li data-key="' + childSnapshot.key + '">';
+      list += '<li class="pool clickable" pool-id="' + childSnapshot.key + '">';
       list += childSnapshot.key;
       list += '</li>';
       list += '<hr>';
+      reverseList.push(list);
+      list = ''
     });
+    reverseList = reverseList.reverse();
+    for (i = 0; i < reverseList.length; i++) {
+      list += reverseList[i];
+    };
     poolsList.innerHTML = list;
   });
+  
+  
+  
 });
 
 function generatePoolId() {
@@ -78,6 +101,7 @@ function changePool(pool) {
   currentPool = database.ref('pools/' + pool);
   
   currentPool.on('value', function(snapshot) {
+    var reverseList = []
     var list = '';
     snapshot.forEach(function(childSnapshot) {
       list += '<li data-key="' + childSnapshot.key + '">';
@@ -90,10 +114,31 @@ function changePool(pool) {
       }
       list += '</div></li>';
       list += '<hr>';
+      reverseList.push(list);
+      list = ''
     });
+    var reversedList = reverseList.reverse();
+    for (i = 0; i < reversedList.length; i++) {
+      list += reversedList[i];
+    };
     poolContents.innerHTML = list;
-    textCurrentPool.textContent = pool;
+    textCurrentPool.innerHTML = 'current pool: ' + pool + '<button id="btnRandomChoice" type="button" class="btn btn-outline-dark clickable float-right">random choice</button>';
+    
+    btnRandomChoice.addEventListener('click', function() {
+      $('#modalRandomChoice').modal('show');
+    });;
   });
+}
+
+function randomChoice(snapshot) {
+  list = [];
+  currentPool.on('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      list.push(childSnapshot.val());
+    });
+  });
+  randomIndex = Math.floor(Math.random() * list.length);
+  return (list[randomIndex]);
 }
 
 function del(key) {
