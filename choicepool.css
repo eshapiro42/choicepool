@@ -6,12 +6,8 @@
   margin-top: 40px !important;
 }
 
-.padded-bottom {
-  margin-bottom: 40px !important;
-}
-
 ol {
-  height: 60vh;
+  height: 65vh;
   overflow: hidden;
   overflow-y: auto;
 }
@@ -29,4 +25,13 @@ ol,li {
 
 .clickable {
   cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  ol {
+    height: auto !important;
+  }
+  .padded-top {
+    margin-top: 20px !important;
+  }
 }
